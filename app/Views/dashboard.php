@@ -69,9 +69,11 @@
         </div>
 
         <div class="mt-5">
+            <a href="<?= base_url('login/logout') ?>">
             <button class="logout-btn">
                 <i class="bi bi-box-arrow-left logout-icon"></i> LOGOUT
             </button>
+            </a>
         </div>
     </div>
 

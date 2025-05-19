@@ -136,7 +136,7 @@ class StudentRecord extends BaseController
 
                 session()->setFlashdata('error', $errorMessages);
 
-                return redirect()->to('/');
+                return redirect()->to('StudentRecord');
             }
 
             $dataForm = [
@@ -158,7 +158,7 @@ class StudentRecord extends BaseController
                 echo "Failed to add student record.";
             }
 
-            return redirect()->to('/');
+            return redirect()->to('StudentRecord');
                 
         }
     }
@@ -171,7 +171,7 @@ class StudentRecord extends BaseController
             echo "Failed to delete student record.";
         }
 
-        return redirect()->to('/');
+        return redirect()->to('StudentRecord');
     }
 
     public function editStudentRecord($id)
@@ -184,7 +184,7 @@ class StudentRecord extends BaseController
 
                 session()->setFlashdata('error', $errorMessages);
 
-                return redirect()->to('/');
+                return redirect()->to('StudentRecord');
             }
 
             $dataForm = [
@@ -206,7 +206,7 @@ class StudentRecord extends BaseController
                 echo "Failed to update student record.";
             }
 
-            return redirect()->to('/');
+            return redirect()->to('StudentRecord');
         }
 
 
