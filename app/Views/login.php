@@ -12,28 +12,41 @@
 </head>
 
 <body>
+    <!-- Main Container -->
     <div class="login-container">
+        <!-- Header -->
         <div class="login-header">
             <i class="bi bi-people-fill"></i>
             <h3>LOGIN</h3>
         </div>
-        <form action="<?= site_url('Login/auth') ?>" method="POST">
-<?php if(session()->getFlashdata('error')): ?>
-    <div class="alert alert-danger">
-        <?= session()->getFlashdata('error') ?>
-    </div>
-<?php endif; ?>
 
+        <!-- Login Form -->
+        <?= form_open('Login/auth'); ?>
+
+            <!-- Error Message -->
+            <?php if(session()->getFlashdata('error')): ?>
+                <div class="alert alert-danger">
+                    <?= session()->getFlashdata('error') ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Username and Password Fields -->
             <div class="mb-3">
-                <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-control-input"/>
+                <?= form_label('Username', 'username', ['class' => 'form-label']) ?>
+                <?= form_input('username', '', ['class' => 'form-control-input', 'id' => 'username']) ?>
             </div>
             <div class="mb-4">
-                <label class="form-label">Password</label>
-                <input type="password" name="password" class="form-control-input"/>
+                <?= form_label('Password', 'password', ['class' => 'form-label']) ?>
+                <?= form_password('password', '', ['class' => 'form-control-input', 'id' => 'password']) ?>
             </div>
-            <button type="submit" class="login-btn">LOGIN</button>
-        </form>
+
+            <!-- Login Button -->
+             <?= form_button([
+                'type' => 'submit',
+                'class' => 'login-btn',
+                'content' => 'LOGIN',
+             ]); ?>
+        <?= form_close(); ?>
     </div>
 </body>
 

@@ -4,51 +4,61 @@ use App\Models\UserModel;
 
 class Login extends BaseController
 {
+    protected $session; // session variable
+    protected $rules; // rules for validation
+    protected $userModel; // user model
+
+    public function __construct()
+    {
+        helper(['form']); // load form helper
+        $this->session = session(); // load session
+        $this->userModel = new UserModel(); // load the UserModel
+
+        $this->rules = [ // rules for validation
+            'username' => 'required',
+            'password' => 'required'
+        ];
+    }
+
     public function index()
     {
+        // check if the user is already logged in
+        if ($this->session->get('logged_in')) { 
+            // redirect to the student record page
+            return redirect()->to(site_url('StudentRecord')); 
+        }
+
+        // if not logged in, show the login page
         return view('login'); 
     }
 
     public function auth()
-{
-    helper(['form']);   // form helper
-
-    $rules = [ // rules for validation
-        'username' => 'required',
-        'password' => 'required'
-    ];
-
-    if (!$this->validate($rules)) {   // validate the form
-        return redirect()->to(site_url('Login'))
-                         ->with('error', 'All fields are required.'); // redirect to login page with error message
-    }
-
-    $model = new UserModel(); // load the UserModel
-    $session = session(); // load the session
-
-    $username = $this->request->getPost('username'); // get the username from the form
-    $password = $this->request->getPost('password'); // get the password from the form
-
-    $user = $model->where('Username', $username)->first(); // find the user in the database
-
-    if ($user && $user['Password'] === $password) { // check if the user exists and the password is correct
-        $session->set('logged_in', true); 
-        $session->set('username', $user['Username']); //set the session data 
-        return redirect()->to(site_url('StudentRecord'));// redirect to the dashboard
-    } else {
-        return redirect()->to(site_url('Login'))->with('error', 'Invalid username or password'); // redirect to login page with error message
-    }
-}
-
-
-    public function dashboard()
     {
-        $session = session();
-        if (!$session->get('logged_in')) { // check if the user is logged in
-            return redirect()->to(site_url('Login')); // redirect to login page if not logged in
+        // check if the submitted data passes validation
+        if (!$this->validate($this->rules)) {   
+            // if fails redirect to login page with error message
+            return redirect()->to(site_url('Login'))
+                ->with('error', 'All fields are required.'); 
         }
 
-        return view('dashboard'); // your dashboard view file
+        $username = $this->request->getPost('username'); // get the username from the form
+        $password = $this->request->getPost('password'); // get the password from the form
+
+        // find the user in the database
+        $user = $this->userModel->where('Username', $username)->first(); 
+        
+        // check if the user exists and the password is correct
+        if ($user && $user['Password'] === $password) { 
+            // set session data
+            $this->session->set('logged_in', true); 
+            $this->session->set('username', $user['Username']);
+
+            // redirect to the student record page
+            return redirect()->to(site_url('StudentRecord'));
+        } else {
+            // if the user does not exist or the password is incorrect
+            return redirect()->to(site_url('Login'))->with('error', 'Invalid username or password'); // redirect to login page with error message
+        }
     }
 
     public function logout()

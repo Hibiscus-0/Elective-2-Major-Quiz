@@ -6,14 +6,18 @@ use App\Models\StudentRecordModel;
 
 class StudentRecord extends BaseController
 {
-    public $studentRecordModel;
-    public $validationRules;
+    public $studentRecordModel; // model for student records
+    public $validationRules; // validation rules for student records
 
     public function __construct()
     {
+        // load form helper
         helper('form');
+
+        // load the student record model
         $this->studentRecordModel = new StudentRecordModel();
 
+        // set validation rules for student records
         $this->validationRules = [
             'studentID' => [
                 'label' => 'Student ID',
@@ -118,27 +122,41 @@ class StudentRecord extends BaseController
         ];
 
     }
+
     public function index()
     {
+        // check if the user is logged in
+        if (!session()->get('logged_in')) {
+            // if not logged in, redirect to the login page
+            return redirect()->to('Login');
+        }
+
+        // get all student records
         $data['studentRecord'] = $this->studentRecordModel->findAll();
 
+        // return the view with the student records
         return view('dashboard', $data);
     }
 
     public function addStudentRecord()
     {
-        
+        // check if the request method is POST
         if($this->request->getMethod() == 'POST') {
 
+            // validate the form data
             if (!$this->validate($this->validationRules)) {
+                // if validation fails, get the errors
                 $errors = $this->validator->getErrors();
                 $errorMessages = implode("<br>", $errors);
 
+                // set flashdata with error messages
                 session()->setFlashdata('error', $errorMessages);
 
+                // redirect to the student record page
                 return redirect()->to('StudentRecord');
             }
 
+            // sanitize and get the form data
             $dataForm = [
                 "StudentID" => $this->request->getPost("studentID", FILTER_SANITIZE_STRING),
                 "FirstName" => $this->request->getPost("firstName", FILTER_SANITIZE_STRING),
@@ -152,12 +170,14 @@ class StudentRecord extends BaseController
                 "PROLANG" => $this->request->getPost("prolang", FILTER_SANITIZE_STRING),
             ];
 
+            // save the student record to the database and check if it was successful
             if($this->studentRecordModel->save($dataForm) === true) {
                 echo "Student record added successfully!";
             } else {
                 echo "Failed to add student record.";
             }
 
+            // redirect to the student record page
             return redirect()->to('StudentRecord');
                 
         }
@@ -165,28 +185,36 @@ class StudentRecord extends BaseController
 
     public function deleteStudentRecord($id)
     {
+        // delete the student record with the given ID and check if it was successful
         if ($this->studentRecordModel->delete($id)) {
             echo "Student record deleted successfully!";
         } else {
             echo "Failed to delete student record.";
         }
 
+        // redirect to the student record page
         return redirect()->to('StudentRecord');
     }
 
     public function editStudentRecord($id)
     {
+        // check if the request method is POST
         if($this->request->getMethod() === 'POST')
         {
+
+            // validate the form data
             if (!$this->validate($this->validationRules)) {
+                // if validation fails, get the errors
                 $errors = $this->validator->getErrors();
                 $errorMessages = implode("<br>", $errors);
 
+                // set flashdata with error messages
                 session()->setFlashdata('error', $errorMessages);
 
                 return redirect()->to('StudentRecord');
             }
 
+            // sanitize and get the form data
             $dataForm = [
                 "StudentID" => $this->request->getPost("studentID", FILTER_SANITIZE_STRING),
                 "FirstName" => $this->request->getPost("firstName", FILTER_SANITIZE_STRING),
@@ -200,17 +228,21 @@ class StudentRecord extends BaseController
                 "PROLANG" => $this->request->getPost("prolang", FILTER_SANITIZE_STRING),
             ];
 
+            // update the student record in the database and check if it was successful
             if($this->studentRecordModel->update($id, $dataForm) === true) {
                 echo "Student record updated successfully!";
             } else {
                 echo "Failed to update student record.";
             }
 
+            // redirect to the student record page
             return redirect()->to('StudentRecord');
         }
 
-
+        // if the request method is not POST, get the student record with the given ID
         $studentRecord = $this->studentRecordModel->find($id);
+
+        // return the data
         return $studentRecord;
     }
 }
